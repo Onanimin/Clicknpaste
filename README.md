@@ -23,7 +23,7 @@ Clicknpaste is a small Pastebin-style app that lets users create a text paste, g
 
 Copy [.env.example](.env.example) to `.env` and set:
 
-- `DATABASE_URL` - Optional; PostgreSQL connection string (uses local .data/pastes.json if not set)
+- `DATABASE_URL` - PostgreSQL connection string. For Neon this should include the full URL, e.g. `postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require&schema=public`
 - `BASE_URL` - Optional; defaults to request origin
 - `TEST_MODE` - Optional; set to "1" to enable deterministic time testing via `x-test-now-ms` header
 

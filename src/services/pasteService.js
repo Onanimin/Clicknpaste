@@ -167,7 +167,13 @@ export async function consumePaste(id, currentTime, password) {
   }
 
   return prisma.$transaction(async (transaction) => {
-    const pasteRow = await transaction.paste.findUnique({ where: { id } });
+    const lockedRows = await transaction.$queryRaw(Prisma.sql`
+      SELECT "id", "content", "createdAt", "expiresAt", "maxViews", "viewCount", "passwordHash"
+      FROM "Paste"
+      WHERE "id" = ${id}
+      FOR UPDATE
+    `);
+    const pasteRow = lockedRows[0] ?? null;
 
     if (!pasteRow) {
       return { error: 'NOT_FOUND' };
