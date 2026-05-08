@@ -3,17 +3,12 @@ const result = document.getElementById('result');
 const error = document.getElementById('error');
 const recentCreated = new Map();
 
-function toLocalSafeHref(url) {
+function toShareUrl(url) {
   try {
     const parsed = new URL(url, window.location.origin);
-
-    if (/^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(parsed.host)) {
-      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-    }
-
     return parsed.toString();
   } catch {
-    return url;
+    return String(url);
   }
 }
 
@@ -24,13 +19,13 @@ function showError(message) {
 }
 
 function showResult(payload) {
-  const href = toLocalSafeHref(payload.url);
+  const shareUrl = toShareUrl(payload.url);
   result.innerHTML = '';
   const container = document.createElement('div');
   const text = document.createTextNode('Paste created: ');
   const link = document.createElement('a');
-  link.href = href;
-  link.textContent = href;
+  link.href = shareUrl;
+  link.textContent = shareUrl;
   container.appendChild(text);
   container.appendChild(link);
 
@@ -39,7 +34,7 @@ function showResult(payload) {
   copyUrlBtn.style.marginLeft = '8px';
   copyUrlBtn.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(window.location.origin + href);
+      await navigator.clipboard.writeText(shareUrl);
       const prev = copyUrlBtn.textContent;
       copyUrlBtn.textContent = 'Copied';
       setTimeout(() => { copyUrlBtn.textContent = prev; }, 2000);
