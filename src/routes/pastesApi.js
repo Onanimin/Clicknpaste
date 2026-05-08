@@ -13,7 +13,8 @@ export function createPastesApiRouter({ createPaste, consumePaste }) {
         content: request.body.content,
         ttlSeconds: request.body.ttl_seconds,
         maxViews: request.body.max_views,
-        password: request.body.password
+        password: request.body.password,
+        currentTime: getCurrentTimeForExpiry(request)
       });
 
       response.set('Cache-Control', 'no-store');

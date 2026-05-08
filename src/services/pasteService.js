@@ -72,9 +72,9 @@ function checkPrivateAccess(paste, password) {
   return { ok: true };
 }
 
-async function createPasteFile({ content, maxViews, password, ttlSeconds }) {
+async function createPasteFile({ content, maxViews, password, ttlSeconds, currentTime = new Date() }) {
   const id = nanoid(12);
-  const now = new Date();
+  const now = currentTime;
   const expiresAt = ttlSeconds ? new Date(now.getTime() + ttlSeconds * 1000) : null;
   const pastes = await readPasteStore();
 
@@ -138,11 +138,11 @@ async function checkDatabaseConnectionFile() {
   await mkdir(dataDirectory, { recursive: true });
 }
 
-export async function createPaste({ content, maxViews, password, ttlSeconds }) {
-  const expiresAt = ttlSeconds ? new Date(Date.now() + ttlSeconds * 1000) : null;
+export async function createPaste({ content, maxViews, password, ttlSeconds, currentTime = new Date() }) {
+  const expiresAt = ttlSeconds ? new Date(currentTime.getTime() + ttlSeconds * 1000) : null;
 
   if (!process.env.DATABASE_URL) {
-    return createPasteFile({ content, maxViews, password, ttlSeconds });
+    return createPasteFile({ content, maxViews, password, ttlSeconds, currentTime });
   }
 
   const id = nanoid(12);
@@ -198,7 +198,9 @@ export async function consumePaste(id, currentTime, password) {
       UPDATE "Paste"
       SET "viewCount" = "viewCount" + 1
       WHERE "id" = ${id}
-      RETURNING "id", "content", "expiresAt", "maxViews", "viewCount", "passwordHash"
+        AND ("expiresAt" IS NULL OR "expiresAt" > ${currentTime})
+        AND ("maxViews" IS NULL OR "viewCount" < "maxViews")
+      RETURNING "id", "content", "createdAt", "expiresAt", "maxViews", "viewCount", "passwordHash"
     `);
 
     const paste = rows[0] ?? null;
