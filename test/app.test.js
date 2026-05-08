@@ -73,6 +73,7 @@ describe('clicknpaste app', () => {
   });
 
   it('uses http for localhost share urls', async () => {
+    const localHost = 'localhost:3000';
     const app = createApp({
       checkDatabaseConnectionFn: async () => {},
       createPasteFn: async () => ({ id: 'paste123' }),
@@ -81,11 +82,11 @@ describe('clicknpaste app', () => {
 
     const response = await request(app)
       .post('/api/pastes')
-      .set('host', 'localhost:3000')
+      .set('host', localHost)
       .send({ content: 'hello' });
 
     expect(response.status).toBe(201);
-    expect(response.body.url).toBe('http://localhost:3000/p/paste123');
+    expect(response.body.url).toBe(`http://${localHost}/p/paste123`);
   });
 
   it('returns json for malformed body input', async () => {

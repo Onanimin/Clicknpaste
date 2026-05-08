@@ -50,7 +50,7 @@ Copy [.env.example](.env.example) to `.env` and set:
 3. Generate Prisma client: `npm run prisma:generate`
 4. (Optional) Push schema to database: `npm run prisma:push`
 5. Start dev server: `npm run dev`
-6. Open http://localhost:3000
+6. Open the local app on port 3000
 7. Run tests: `npm test`
 
 ## Deployment to Vercel
